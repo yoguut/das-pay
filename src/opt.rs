@@ -6,8 +6,9 @@ pub struct Opt {
 }
 
 impl Opt {
+    /// Returns a instance of Opt if path exist,
+    /// else returns None.
     pub fn new(path: String) -> Option<Opt> {
-        // validate input path
         let p = PathBuf::from(path);
         if p.exists() {
             let opt = Opt { file_path: p };
