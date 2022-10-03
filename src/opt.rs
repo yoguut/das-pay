@@ -1,6 +1,4 @@
-use std::{
-    path::PathBuf,
-};
+use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct Opt {
@@ -12,9 +10,7 @@ impl Opt {
         // validate input path
         let p = PathBuf::from(path);
         if p.exists() {
-            let opt = Opt {
-                file_path: p,
-            };
+            let opt = Opt { file_path: p };
             Some(opt)
         } else {
             None

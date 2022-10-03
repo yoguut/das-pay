@@ -1,8 +1,8 @@
 mod opt;
 
-use anyhow::{ Context, Result };
+use anyhow::{Result};
 use opt::Opt;
-use std::env::{ self };
+use std::env::{self};
 
 fn main() -> Result<(), anyhow::Error> {
     let file_path = env::args().nth(1);
