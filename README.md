@@ -1,3 +1,3 @@
-# kraken-pay
+# das-pay
 
-Homework from Kraken core backend team interview.
+People's payment engine CLI.
