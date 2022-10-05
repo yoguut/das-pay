@@ -2,6 +2,7 @@ mod cli;
 mod models;
 
 use crate::cli::Opt;
+use crate::models::{Account, Trans};
 use anyhow::{Context, Result};
 use std::env::{self};
 use std::fs;
