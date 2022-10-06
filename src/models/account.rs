@@ -11,6 +11,13 @@ pub struct Account {
     pub held: f32,
     pub available: f32,
     pub locked: bool,
+    pub total: f32,
+}
+
+impl Account {
+    pub fn new(id: u16, held: f32, available: f32, locked: bool) -> Self {
+        Account { id: id, held: held, available: available, locked: locked, total: held + available }
+    }
 }
 
 impl fmt::Display for Account {
