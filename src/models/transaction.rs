@@ -1,6 +1,12 @@
 use serde::Deserialize;
 use std::fmt;
 
+/// type,client,tx,amount
+/// deposit,1,1,1
+/// deposit,2,2,2
+/// deposit,1,3,2
+/// withdrawal,1,4,1.5
+/// withdrawal,2,5,3
 #[derive(Debug, Deserialize)]
 pub struct Transaction {
     #[serde(rename(deserialize = "type"))]

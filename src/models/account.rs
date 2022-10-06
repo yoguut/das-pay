@@ -1,6 +1,9 @@
 use serde::Serialize;
 use std::fmt;
 
+/// client,available,held,total,locked
+/// 1,1.5,0.0,false
+/// 2,2.0,0.0,false
 #[derive(Debug, Serialize)]
 pub struct Account {
     #[serde(rename(serialize = "client"))]
