@@ -12,7 +12,8 @@ fn main() -> Result<(), anyhow::Error> {
     let file_path = env::args().nth(1).context("Invalid command")?;
     let opt = Opt::new(file_path).context("Cannot find input file")?;
     let mut rdr = csv::Reader::from_path(opt.path)?;
-    for result in rdr.deserialize() {
+    let mut results = rdr.deserialize();
+    for result in results {
         let trans: Transaction = result?;
         eprintln!("{:?}", trans);
     }

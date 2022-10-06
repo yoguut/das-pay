@@ -30,7 +30,10 @@ path.
 
 ## Journal
 
-The Journal is a `mdbook` on its own under the `journal` subdirectory. It's there to keep a record of my current progress, so I can get more contexts on whatever topics I am researching before passing out.
+The Journal is a `mdbook` under the `journal` subdirectory.
+I need it to keep contexts on whatever topics I am researching before.
+
+> Not relevant for interview.
 
 ## License
 
