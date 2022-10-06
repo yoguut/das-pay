@@ -1,5 +1,5 @@
-mod trans;
+mod transaction;
 mod account;
 
-pub use trans::Trans;
+pub use transaction::Transaction;
 pub use account::Account;

@@ -16,6 +16,8 @@ Since this repo tracks large files as pointers to a lfs bucket, lfs needs to be 
 git lfs pull
 ```
 
+> WARNING: If you choose to ignore this guide and forget to pull LFS assets, you can run into serialization error.
+
 Next, run the following terminal commands in the repo directory:
 
 ```bash,ignore
