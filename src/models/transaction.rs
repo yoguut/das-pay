@@ -3,11 +3,11 @@ use std::fmt;
 
 #[derive(Debug, Deserialize)]
 pub struct Transaction {
-    #[serde(rename(serialize = "type", deserialize = "type"))]
+    #[serde(rename(deserialize = "type"))]
     pub trans_type: String,
-    #[serde(rename(serialize = "client", deserialize = "client"))]
+    #[serde(rename(deserialize = "client"))]
     pub client_id: u16,
-    #[serde(rename(serialize = "tx", deserialize = "tx"))]
+    #[serde(rename(deserialize = "tx"))]
     pub tx_id: u32, // globally unique
     pub amount: f32,
 }
