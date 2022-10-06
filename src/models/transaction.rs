@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use std::fmt;
 
 #[derive(Debug, Deserialize)]
 pub struct Transaction {
@@ -16,5 +17,11 @@ impl Transaction {
             tx_id,
             amount,
         }
+    }
+}
+
+impl fmt::Display for Transaction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "trans_type: {}, client_id: {}, tx_id: {}, amount: {}", self.trans_type, self.client_id, self.tx_id, self.amount)
     }
 }

@@ -144,13 +144,44 @@
                     <main>
                         <h1 id="2022"><a class="header" href="#2022">2022</a></h1>
 <h2 id="how-to-validate-file-path"><a class="header" href="#how-to-validate-file-path">How to validate file path?</a></h2>
+<p><code>PathBuf</code> has a method <code>exists()</code> for validating if a file path exists.</p>
+<h2 id="how-to-abstract-cli-module-away-from-core-functionality"><a class="header" href="#how-to-abstract-cli-module-away-from-core-functionality">How to abstract CLI module away from core functionality?</a></h2>
+<blockquote>
+<p>This app should be agnostic to any types of interfaces, since interfaces can be either CLI or a GTK app or QT app or whatever. Its core functionality should be compartmentalized as a shared component.</p>
+</blockquote>
+<p>Looks like Rust kinda treats folders as module itself as long as I have a <code>mod.rs</code> file inside of the subdirectory. And then the <code>main.rs</code> should be able to import it without problem.</p>
 <h2 id="how-to-serialize-csv-into-data-model"><a class="header" href="#how-to-serialize-csv-into-data-model">How to serialize csv into data model?</a></h2>
+<blockquote>
+<p>I want to have a strongly typed data model to provide basic data validation when handling csv. Assuming the input csv can be potentially large
+and may not be sanitized to the correct format. Using a typed data model can be easier for me.</p>
+</blockquote>
+<blockquote>
+<p>The <code>serde</code> crate has pointed out that performing serialization can cause some performance decrease.</p>
+</blockquote>
+<p>The <code>serde</code> crate can provide a outer attribute <code>#[Debug, Deserialize]</code> to generate automatic implementation for <code>Deserialize</code> a Rust struct.</p>
+<p>This feature needs to be explicitly enabled in <code>Cargo.toml</code>.</p>
+<p>Very nice &amp; clean, but it have abstracted too much implementation details away from beginner learner.</p>
+<p>How do I manually implementation its <code>Deserialize</code> trait without using the <code>Deserialize</code> macro?</p>
+<h2 id="how-to-print-transaction-object"><a class="header" href="#how-to-print-transaction-object">How to print Transaction object?</a></h2>
+<blockquote>
+<p>I want to see if my serialization method works line by line.</p>
+</blockquote>
+<p><code>Transaction</code> needs to conform to the <code>fmt::Display</code> trait in order for the print method to call because the print method doesn't know how to coerce a custom object into string to flash onto the console.</p>
+<h2 id="how-do-i-host-std-doc-locally"><a class="header" href="#how-do-i-host-std-doc-locally">How do I host std doc locally?</a></h2>
+<blockquote>
+<p>I want to read the doc of <code>fmt::Display</code> to see the required implementation(s).</p>
+</blockquote>
+<p><a href="https://www.reddit.com/r/rust/comments/vtjzur/how_to_host_rust_std_docs_on_my_local_machine/">this thread</a></p>
+<p><code>rustup doc --std</code></p>
+<p>It kinda worked and opened the doc, but got some problems with my browsers. Meh.</p>
 <h2 id="how-to-serialize-csv-into-data-model-of-different-property-identifier-with-serde"><a class="header" href="#how-to-serialize-csv-into-data-model-of-different-property-identifier-with-serde">How to serialize csv into data model of different property identifier with serde?</a></h2>
 <h2 id="how-to-read-apptoml-config"><a class="header" href="#how-to-read-apptoml-config">How to read app.toml config?</a></h2>
+<blockquote>
 <p>I want to allow an <code>app.toml</code> config file to provide definitions on the number of CPU cores for multi-process tasks.
 Because the default implement of Rust's threading topology is N-N, which matches the exact number of CPU cores. This
 enhancement allows the app's multi-threaded codes to be flexible and at the same time giving more control to user's
 machine.</p>
+</blockquote>
 
                     </main>
 

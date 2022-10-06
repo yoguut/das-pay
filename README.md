@@ -28,6 +28,10 @@ The above command will output a summary of accounts based on the recent transact
 If you have a different input file you would like to use, simply point the input csv to your desired file
 path.
 
+## Journal
+
+The Journal is a `mdbook` on its own under the `journal` subdirectory. It's there to keep a record of my current progress, so I can get more contexts on whatever topics I am researching before passing out.
+
 ## License
 
 GPL 3.0
