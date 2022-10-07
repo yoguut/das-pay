@@ -31,6 +31,10 @@ impl Transaction {
 
 impl fmt::Display for Transaction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "trans_type/type: {}, client_id/client: {}, tx_id/tx: {}, amount: {}", self.trans_type, self.client_id, self.tx_id, self.amount)
+        write!(
+            f,
+            "trans_type/type: {}, client_id/client: {}, tx_id/tx: {}, amount: {}",
+            self.trans_type, self.client_id, self.tx_id, self.amount
+        )
     }
 }

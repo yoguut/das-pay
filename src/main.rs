@@ -8,7 +8,6 @@ use csv;
 use std::{
     collections::HashMap,
     env::{self},
-    error::Error,
     io,
 };
 
@@ -28,23 +27,21 @@ fn main() -> Result<(), anyhow::Error> {
             Some(id) => {
                 // process & update map
                 println!("existing id {} in map", id);
-            },
+            }
             None => {
-                let deposit = String::from("deposit");
-                match trans.trans_type {
-                    deposit => {
+                match trans.trans_type.as_str() {
+                    "deposit" => {
                         // valid operation
                         let acc = Account::new(trans.client_id, 0.0_f32, trans.amount, false);
                         map.insert(trans.client_id, acc);
-                    },
+                    }
                     _ => continue,
                 }
-            },
+            }
         }
-        // eprintln!("{:?}", &trans);
     }
 
-    eprintln!("{:?}", map);
-    wtr.flush();
+    // eprintln!("{:?}", map);
+    wtr.flush()?;
     Ok(())
 }

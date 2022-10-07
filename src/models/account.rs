@@ -16,12 +16,22 @@ pub struct Account {
 
 impl Account {
     pub fn new(id: u16, held: f32, available: f32, locked: bool) -> Self {
-        Account { id: id, held: held, available: available, locked: locked, total: held + available }
+        Account {
+            id: id,
+            held: held,
+            available: available,
+            locked: locked,
+            total: held + available,
+        }
     }
 }
 
 impl fmt::Display for Account {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "client/id: {}, held: {}, available: {}, locked: {}", self.id, self.held, self.available, self.locked)
+        write!(
+            f,
+            "client/id: {}, held: {}, available: {}, locked: {}",
+            self.id, self.held, self.available, self.locked
+        )
     }
 }
