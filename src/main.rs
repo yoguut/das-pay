@@ -25,7 +25,7 @@ fn main() -> Result<(), anyhow::Error> {
     sequential_serde(rdr, wtr)
 }
 
-// O(n^2)
+// O(2n)
 // loop through each transaction for validation
 fn sequential_serde(
     mut rdr: csv::Reader<File>,
@@ -34,9 +34,12 @@ fn sequential_serde(
     let mut transaction_map = TransactionHM::new();
     let mut account_map = AccountHM::new();
 
+    // O(n)
     for (idx, result) in rdr.deserialize().enumerate() {
         let err_msg = format!("Invalid transaction: Malformed object at {}", idx);
         let trans: Transaction = result.context(err_msg)?;
+
+        println!("{:?}", trans);
 
         match trans.trans_type.as_str() {
             "deposit" => match account_map.get_mut(&trans.client_id) {
@@ -104,7 +107,14 @@ fn sequential_serde(
         }
     }
     let accounts = account_map.values().cloned().collect::<Vec<Account>>();
+    // O(n)
+    // accounts
     for acc in accounts {
+        // convert amount to precise up to 4 decimal places
+        // without losing the actual account obj's amount
+        // inside of account_map
+        let mut acc = acc.clone();
+        acc.total = (acc.total * 10000_f32).round() / 10000_f32;
         wtr.serialize(acc)?;
     }
     wtr.flush()?;
