@@ -4,7 +4,7 @@ use std::fmt;
 /// client,available,held,total,locked
 /// 1,1.5,0.0,false
 /// 2,2.0,0.0,false
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Account {
     #[serde(rename(serialize = "client"))]
     pub id: u16,

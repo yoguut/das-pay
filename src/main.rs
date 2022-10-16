@@ -103,6 +103,10 @@ fn sequential_serde(
             _ => continue,
         }
     }
+    let accounts = account_map.values().cloned().collect::<Vec<Account>>();
+    for acc in accounts {
+        wtr.serialize(acc)?;
+    }
     wtr.flush()?;
     Ok(())
 }
