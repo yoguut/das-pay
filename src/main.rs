@@ -8,6 +8,7 @@ use csv;
 use std::{
     collections::HashMap,
     env::{self},
+    fs::File,
     io,
 };
 
@@ -15,20 +16,24 @@ use std::{
 type AccountHM = HashMap<u16, Account>;
 /// transacton id: transaction
 type TransactionHM = HashMap<u32, Transaction>;
-/// transaction id: transaction state
-type DisputeHM = HashMap<u32, String>;
 
 fn main() -> Result<(), anyhow::Error> {
     let file_path = env::args().nth(1).context("Invalid cmd")?;
     let opt = Opt::new(file_path).context("Invalid cmd: Input file not found")?;
-    let mut rdr = csv::Reader::from_path(opt.path)?;
-    let mut wtr = csv::Writer::from_writer(io::stdout());
+    let rdr = csv::Reader::from_path(opt.path)?;
+    let wtr = csv::Writer::from_writer(io::stdout());
+    sequential_serde(rdr, wtr)
+}
+
+// O(n^2)
+// loop through each transaction for validation
+fn sequential_serde(
+    mut rdr: csv::Reader<File>,
+    mut wtr: csv::Writer<io::Stdout>,
+) -> Result<(), anyhow::Error> {
     let mut transaction_map = TransactionHM::new();
     let mut account_map = AccountHM::new();
-    let mut dispute_map = DisputeHM::new();
 
-    // O(n^2)
-    // loop through each transaction for validation
     for (idx, result) in rdr.deserialize().enumerate() {
         let err_msg = format!("Invalid transaction: Malformed object at {}", idx);
         let trans: Transaction = result.context(err_msg)?;
@@ -67,7 +72,6 @@ fn main() -> Result<(), anyhow::Error> {
                         let amount = existing_trans.amount.unwrap_or(0_f32);
                         existing_acc.held += amount;
                         existing_acc.available -= amount;
-                        dispute_map.insert(existing_trans.tx_id, String::from("dispute"));
                     }
                 }
             }
@@ -80,7 +84,6 @@ fn main() -> Result<(), anyhow::Error> {
                         let amount = existing_trans.amount.unwrap_or(0_f32);
                         existing_acc.available += amount;
                         existing_acc.held -= amount;
-                        dispute_map.insert(existing_trans.tx_id, String::from("resolve"));
                     }
                 }
             }
@@ -94,14 +97,12 @@ fn main() -> Result<(), anyhow::Error> {
                         existing_acc.available -= amount;
                         existing_acc.held -= amount;
                         existing_acc.locked = true;
-                        dispute_map.insert(existing_trans.tx_id, String::from("chargeback"));
                     }
                 }
             }
             _ => continue,
         }
     }
-    println!("account_map: {:?}", account_map);
     wtr.flush()?;
     Ok(())
 }
