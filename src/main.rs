@@ -36,7 +36,9 @@ fn main() -> Result<(), anyhow::Error> {
         match trans.trans_type.as_str() {
             "deposit" => match account_map.get_mut(&trans.client_id) {
                 Some(existing_acc) => {
-                    existing_acc.available += trans.amount.unwrap_or(0_f32);
+                    if !existing_acc.locked {
+                        existing_acc.available += trans.amount.unwrap_or(0_f32);
+                    }
                 }
                 None => {
                     let new_acc =
@@ -51,7 +53,7 @@ fn main() -> Result<(), anyhow::Error> {
                     .context("Fail to withdrawal: Account not found")?;
                 // check if account has sufficient available funds
                 let withdraw_amount = trans.amount.unwrap_or(0_f32);
-                if existing_acc.available >= withdraw_amount {
+                if existing_acc.available >= withdraw_amount && !existing_acc.locked {
                     existing_acc.available -= withdraw_amount;
                     transaction_map.insert(trans.tx_id, trans);
                 }
@@ -60,34 +62,40 @@ fn main() -> Result<(), anyhow::Error> {
                 let existing_acc = account_map
                     .get_mut(&trans.client_id)
                     .context("Fail to dispute: Account not found")?;
-                if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
-                    let amount = existing_trans.amount.unwrap_or(0_f32);
-                    existing_acc.held += amount;
-                    existing_acc.available -= amount;
-                    dispute_map.insert(existing_trans.tx_id, String::from("dispute"));
+                if !existing_acc.locked {
+                    if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
+                        let amount = existing_trans.amount.unwrap_or(0_f32);
+                        existing_acc.held += amount;
+                        existing_acc.available -= amount;
+                        dispute_map.insert(existing_trans.tx_id, String::from("dispute"));
+                    }
                 }
             }
             "resolve" => {
                 let existing_acc = account_map
                     .get_mut(&trans.client_id)
                     .context("Fail to resolve: Account not found")?;
-                if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
-                    let amount = existing_trans.amount.unwrap_or(0_f32);
-                    existing_acc.available += amount;
-                    existing_acc.held -= amount;
-                    dispute_map.insert(existing_trans.tx_id, String::from("resolve"));
+                if !existing_acc.locked {
+                    if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
+                        let amount = existing_trans.amount.unwrap_or(0_f32);
+                        existing_acc.available += amount;
+                        existing_acc.held -= amount;
+                        dispute_map.insert(existing_trans.tx_id, String::from("resolve"));
+                    }
                 }
             }
             "chargeback" => {
                 let existing_acc = account_map
                     .get_mut(&trans.client_id)
                     .context("Fail to chargeback: Account not found")?;
-                if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
-                    let amount = existing_trans.amount.unwrap_or(0_f32);
-                    existing_acc.available -= amount;
-                    existing_acc.held -= amount;
-                    existing_acc.locked = true;
-                    dispute_map.insert(existing_trans.tx_id, String::from("chargeback"));
+                if !existing_acc.locked {
+                    if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
+                        let amount = existing_trans.amount.unwrap_or(0_f32);
+                        existing_acc.available -= amount;
+                        existing_acc.held -= amount;
+                        existing_acc.locked = true;
+                        dispute_map.insert(existing_trans.tx_id, String::from("chargeback"));
+                    }
                 }
             }
             _ => continue,
