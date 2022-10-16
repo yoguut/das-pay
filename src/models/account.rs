@@ -30,8 +30,8 @@ impl fmt::Display for Account {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "client/id: {}, held: {}, available: {}, locked: {}",
-            self.id, self.held, self.available, self.locked
+            "client/id: {}, held: {}, available: {}, locked: {}, total: {}",
+            self.id, self.held, self.available, self.locked, self.total
         )
     }
 }
