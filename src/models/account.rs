@@ -7,11 +7,11 @@ use std::fmt;
 #[derive(Debug, Clone, Serialize)]
 pub struct Account {
     #[serde(rename(serialize = "client"))]
-    pub id: u16,
-    pub held: f32,
-    pub available: f32,
+    id: u16,
+    held: f32,
+    available: f32,
     pub locked: bool,
-    pub total: f32,
+    total: f32,
 }
 
 impl Account {
@@ -24,14 +24,86 @@ impl Account {
             total: held + available,
         }
     }
+
+    pub fn get_held(&self) -> f32 {
+        self.held
+    }
+
+    pub fn set_held(&mut self, val: f32) {
+        if !self.locked {
+            self.held = val;
+            self.total = self.held + self.available;
+        }
+    }
+
+    pub fn get_available(&self) -> f32 {
+        self.available
+    }
+
+    pub fn set_available(&mut self, val: f32) {
+        if !self.locked {
+            self.available = val;
+            self.total = self.held + self.available;
+        }
+    }
+
+    pub fn rounded(&self, decimal_places: u32) -> Self {
+        Account {
+            id: self.id,
+            held: _round(self.held, decimal_places),
+            available: _round(self.available, decimal_places),
+            locked: self.locked,
+            total: _round(self.total, decimal_places),
+        }
+    }
 }
 
 impl fmt::Display for Account {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "client/id: {}, held: {}, available: {}, locked: {}, total: {}",
+            "client/id: {}, held: {}, available: {}, locked: {}, total: {:.4}",
             self.id, self.held, self.available, self.locked, self.total
         )
+    }
+}
+
+fn _round(val: f32, decimal_places: u32) -> f32 {
+    (val * 10_f32 * (decimal_places as f32)).round() / (10_f32 * (decimal_places as f32))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_update_total() {
+        let mut acc = Account::new(999_u16, 0_f32, 0_f32, false);
+        assert_eq!(acc.total, 0_f32);
+        acc.set_available(3_f32);
+        assert_eq!(acc.total, 3_f32);
+        acc.set_held(2_f32);
+        assert_eq!(acc.total, 5_f32);
+    }
+
+    #[test]
+    fn should_not_update_funds_on_locked() {
+        let mut acc = Account::new(999_u16, 0_f32, 0_f32, true);
+        acc.set_available(3_f32);
+        assert_eq!(acc.total, 0_f32);
+        acc.set_held(2_f32);
+        assert_eq!(acc.total, 0_f32);
+    }
+
+    #[test]
+    fn should_round_funds() {
+        let acc = Account::new(999_u16, 0.12345_f32, 0.12345_f32, false);
+        assert_eq!(acc.available, 0.12345_f32);
+        assert_eq!(acc.held, 0.12345_f32);
+        assert_eq!(acc.total, 0.24690_f32);
+        let rounded_acc = acc.rounded(4_u32);
+        assert_eq!(rounded_acc.available, 0.1235_f32);
+        assert_eq!(rounded_acc.held, 0.1235_f32);
+        assert_eq!(rounded_acc.total, 0.2469_f32);
     }
 }

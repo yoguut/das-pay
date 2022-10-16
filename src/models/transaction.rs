@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use std::fmt;
+use std::string::String;
 
 /// type,client,tx,amount
 /// deposit,1,1,1
@@ -11,12 +12,30 @@ use std::fmt;
 pub struct Transaction {
     /// trans_type: [deposit, withdrawal, dispute, resolve, chargeback]
     #[serde(rename(deserialize = "type"))]
-    pub trans_type: String,
+    trans_type: String,
     #[serde(rename(deserialize = "client"))]
-    pub client_id: u16,
+    client_id: u16,
     #[serde(rename(deserialize = "tx"))]
-    pub tx_id: u32, // globally unique
-    pub amount: Option<f32>,
+    tx_id: u32, // globally unique
+    amount: Option<f32>,
+}
+
+impl Transaction {
+    pub fn get_trans_type(&self) -> String {
+        self.trans_type.clone()
+    }
+
+    pub fn get_client_id(&self) -> u16 {
+        self.client_id
+    }
+
+    pub fn get_tx_id(&self) -> u32 {
+        self.tx_id
+    }
+
+    pub fn get_amount(&self) -> Option<f32> {
+        self.amount
+    }
 }
 
 impl fmt::Display for Transaction {

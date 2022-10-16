@@ -41,64 +41,71 @@ fn sequential_serde(
 
         println!("{:?}", trans);
 
-        match trans.trans_type.as_str() {
-            "deposit" => match account_map.get_mut(&trans.client_id) {
+        match trans.get_trans_type().as_str() {
+            "deposit" => match account_map.get_mut(&trans.get_client_id()) {
                 Some(existing_acc) => {
                     if !existing_acc.locked {
-                        existing_acc.available += trans.amount.unwrap_or(0_f32);
+                        let available =
+                            existing_acc.get_available() + trans.get_amount().unwrap_or(0_f32);
+                        existing_acc.set_available(available);
                     }
                 }
                 None => {
-                    let new_acc =
-                        Account::new(trans.client_id, 0_f32, trans.amount.unwrap_or(0_f32), false);
-                    account_map.insert(trans.client_id, new_acc);
-                    transaction_map.insert(trans.tx_id, trans);
+                    let new_acc = Account::new(
+                        trans.get_client_id(),
+                        0_f32,
+                        trans.get_amount().unwrap_or(0_f32),
+                        false,
+                    );
+                    account_map.insert(trans.get_client_id(), new_acc);
+                    transaction_map.insert(trans.get_tx_id(), trans);
                 }
             },
             "withdrawal" => {
                 let existing_acc = account_map
-                    .get_mut(&trans.client_id)
+                    .get_mut(&trans.get_client_id())
                     .context("Fail to withdrawal: Account not found")?;
                 // check if account has sufficient available funds
-                let withdraw_amount = trans.amount.unwrap_or(0_f32);
-                if existing_acc.available >= withdraw_amount && !existing_acc.locked {
-                    existing_acc.available -= withdraw_amount;
-                    transaction_map.insert(trans.tx_id, trans);
+                let withdraw_amount = trans.get_amount().unwrap_or(0_f32);
+                if existing_acc.get_available() >= withdraw_amount && !existing_acc.locked {
+                    let available = existing_acc.get_available() - withdraw_amount;
+                    existing_acc.set_available(available);
+                    transaction_map.insert(trans.get_tx_id(), trans);
                 }
             }
             "dispute" => {
                 let existing_acc = account_map
-                    .get_mut(&trans.client_id)
+                    .get_mut(&trans.get_client_id())
                     .context("Fail to dispute: Account not found")?;
                 if !existing_acc.locked {
-                    if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
-                        let amount = existing_trans.amount.unwrap_or(0_f32);
-                        existing_acc.held += amount;
-                        existing_acc.available -= amount;
+                    if let Some(existing_trans) = transaction_map.get_mut(&trans.get_tx_id()) {
+                        let amount = existing_trans.get_amount().unwrap_or(0_f32);
+                        existing_acc.set_held(existing_acc.get_held() + amount);
+                        existing_acc.set_available(existing_acc.get_available() - amount);
                     }
                 }
             }
             "resolve" => {
                 let existing_acc = account_map
-                    .get_mut(&trans.client_id)
+                    .get_mut(&trans.get_client_id())
                     .context("Fail to resolve: Account not found")?;
                 if !existing_acc.locked {
-                    if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
-                        let amount = existing_trans.amount.unwrap_or(0_f32);
-                        existing_acc.available += amount;
-                        existing_acc.held -= amount;
+                    if let Some(existing_trans) = transaction_map.get_mut(&trans.get_tx_id()) {
+                        let amount = existing_trans.get_amount().unwrap_or(0_f32);
+                        existing_acc.set_available(existing_acc.get_available() + amount);
+                        existing_acc.set_held(existing_acc.get_held() - amount);
                     }
                 }
             }
             "chargeback" => {
                 let existing_acc = account_map
-                    .get_mut(&trans.client_id)
+                    .get_mut(&trans.get_client_id())
                     .context("Fail to chargeback: Account not found")?;
                 if !existing_acc.locked {
-                    if let Some(existing_trans) = transaction_map.get_mut(&trans.tx_id) {
-                        let amount = existing_trans.amount.unwrap_or(0_f32);
-                        existing_acc.available -= amount;
-                        existing_acc.held -= amount;
+                    if let Some(existing_trans) = transaction_map.get_mut(&trans.get_tx_id()) {
+                        let amount = existing_trans.get_amount().unwrap_or(0_f32);
+                        existing_acc.set_available(existing_acc.get_available() - amount);
+                        existing_acc.set_held(existing_acc.get_held() - amount);
                         existing_acc.locked = true;
                     }
                 }
@@ -113,8 +120,8 @@ fn sequential_serde(
         // convert amount to precise up to 4 decimal places
         // without losing the actual account obj's amount
         // inside of account_map
-        let mut acc = acc.clone();
-        acc.total = (acc.total * 10000_f32).round() / 10000_f32;
+        println!("{:?}", acc);
+        let acc = acc.clone().rounded(4_u32);
         wtr.serialize(acc)?;
     }
     wtr.flush()?;
