@@ -22,15 +22,17 @@ fn main() -> Result<(), anyhow::Error> {
     let opt = Opt::new(file_path).context("Invalid cmd: Input file not found")?;
     let rdr = csv::Reader::from_path(opt.path)?;
     let wtr = csv::Writer::from_writer(io::stdout());
-    sequential_serde(rdr, wtr)
+    let accounts = sequential_serde(rdr)?;
+    flush(wtr, accounts)
 }
 
 // O(2n)
 // loop through each transaction for validation
-fn sequential_serde(
-    mut rdr: csv::Reader<File>,
-    mut wtr: csv::Writer<io::Stdout>,
-) -> Result<(), anyhow::Error> {
+// this function owns csv::Reader instance because there are many way to
+// deserialize a csv dataset with various performance implications, hence
+// different algorithm may perform different deserialization methods. Hence,
+// it should take ownership of the reader instance.
+fn sequential_serde(mut rdr: csv::Reader<File>) -> Result<Vec<Account>, anyhow::Error> {
     let mut transaction_map = TransactionHM::new();
     let mut account_map = AccountHM::new();
 
@@ -112,12 +114,15 @@ fn sequential_serde(
         }
     }
     let accounts = account_map.values().cloned().collect::<Vec<Account>>();
-    // O(n)
-    // accounts
+    Ok(accounts)
+}
+
+// O(n)
+fn flush(mut wtr: csv::Writer<io::Stdout>, accounts: Vec<Account>) -> Result<(), anyhow::Error> {
+    // convert amount to precise up to 4 decimal places
+    // without losing the actual account obj's amount
+    // inside of account_map
     for acc in accounts {
-        // convert amount to precise up to 4 decimal places
-        // without losing the actual account obj's amount
-        // inside of account_map
         let acc = acc.clone().rounded(4);
         wtr.serialize(acc)?;
     }
