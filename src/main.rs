@@ -39,8 +39,6 @@ fn sequential_serde(
         let err_msg = format!("Invalid transaction: Malformed object at {}", idx);
         let trans: Transaction = result.context(err_msg)?;
 
-        println!("{:?}", trans);
-
         match trans.get_trans_type().as_str() {
             "deposit" => match account_map.get_mut(&trans.get_client_id()) {
                 Some(existing_acc) => {
@@ -120,7 +118,6 @@ fn sequential_serde(
         // convert amount to precise up to 4 decimal places
         // without losing the actual account obj's amount
         // inside of account_map
-        println!("{:?}", acc);
         let acc = acc.clone().rounded(4);
         wtr.serialize(acc)?;
     }
