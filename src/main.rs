@@ -121,7 +121,7 @@ fn sequential_serde(
         // without losing the actual account obj's amount
         // inside of account_map
         println!("{:?}", acc);
-        let acc = acc.clone().rounded(4_u32);
+        let acc = acc.clone().rounded(4);
         wtr.serialize(acc)?;
     }
     wtr.flush()?;

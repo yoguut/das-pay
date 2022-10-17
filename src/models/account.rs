@@ -69,7 +69,7 @@ impl fmt::Display for Account {
 }
 
 fn _round(val: f32, decimal_places: u32) -> f32 {
-    (val * 10_f32 * (decimal_places as f32)).round() / (10_f32 * (decimal_places as f32))
+    (val * 10.0_f32.powf(decimal_places as f32)).round() / (10.0_f32.powf(decimal_places as f32))
 }
 
 #[cfg(test)]
@@ -87,7 +87,7 @@ mod tests {
     }
 
     #[test]
-    fn should_not_update_funds_on_locked() {
+    fn should_not_update_funds_when_locked() {
         let mut acc = Account::new(999_u16, 0_f32, 0_f32, true);
         acc.set_available(3_f32);
         assert_eq!(acc.total, 0_f32);
@@ -97,13 +97,13 @@ mod tests {
 
     #[test]
     fn should_round_funds() {
-        let acc = Account::new(999_u16, 0.12345_f32, 0.12345_f32, false);
-        assert_eq!(acc.available, 0.12345_f32);
-        assert_eq!(acc.held, 0.12345_f32);
-        assert_eq!(acc.total, 0.24690_f32);
-        let rounded_acc = acc.rounded(4_u32);
-        assert_eq!(rounded_acc.available, 0.1235_f32);
-        assert_eq!(rounded_acc.held, 0.1235_f32);
-        assert_eq!(rounded_acc.total, 0.2469_f32);
+        let acc = Account::new(999_u16, 25.12345_f32, 25.12345_f32, false);
+        assert_eq!(acc.available, 25.12345_f32);
+        assert_eq!(acc.held, 25.12345_f32);
+        assert_eq!(acc.total, 50.24690_f32);
+        let rounded_acc = acc.rounded(4);
+        assert_eq!(rounded_acc.available, 25.1235_f32);
+        assert_eq!(rounded_acc.held, 25.1235_f32);
+        assert_eq!(rounded_acc.total, 50.2469_f32);
     }
 }
