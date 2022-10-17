@@ -73,7 +73,7 @@ fn _round(val: f32, decimal_places: u32) -> f32 {
 }
 
 #[cfg(test)]
-mod tests {
+mod account_tests {
     use super::*;
 
     #[test]
