@@ -26,17 +26,12 @@ fn main() -> Result<(), anyhow::Error> {
     flush(wtr, accounts)
 }
 
-// O(2n)
-// loop through each transaction for validation
-// this function owns csv::Reader instance because there are many way to
-// deserialize a csv dataset with various performance implications, hence
-// different algorithm may perform different deserialization methods. Hence,
-// it should take ownership of the reader instance.
+/// loop through each transaction for validation
+/// complexity: O(n)
 fn sequential_serde(mut rdr: csv::Reader<File>) -> Result<Vec<Account>, anyhow::Error> {
     let mut transaction_map = TransactionHM::new();
     let mut account_map = AccountHM::new();
 
-    // O(n)
     for (idx, result) in rdr.deserialize().enumerate() {
         let err_msg = format!("Invalid transaction: Malformed object at {}", idx);
         let trans: Transaction = result.context(err_msg)?;
@@ -113,11 +108,10 @@ fn sequential_serde(mut rdr: csv::Reader<File>) -> Result<Vec<Account>, anyhow::
             _ => continue,
         }
     }
-    let accounts = account_map.values().cloned().collect::<Vec<Account>>();
-    Ok(accounts)
+    Ok(account_map.values().cloned().collect::<Vec<Account>>())
 }
 
-// O(n)
+/// complexity: O(n)
 fn flush(mut wtr: csv::Writer<io::Stdout>, accounts: Vec<Account>) -> Result<(), anyhow::Error> {
     // convert amount to precise up to 4 decimal places
     // without losing the actual account obj's amount
