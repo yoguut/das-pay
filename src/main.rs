@@ -12,9 +12,9 @@ use std::{
     io,
 };
 
-/// account id: account
+/// account.id: account
 type AccountHM = HashMap<u16, Account>;
-/// transacton id: transaction
+/// transaction.tx_id: transaction
 type TransactionHM = HashMap<u32, Transaction>;
 
 fn main() -> Result<(), anyhow::Error> {
@@ -26,8 +26,15 @@ fn main() -> Result<(), anyhow::Error> {
     flush(wtr, accounts)
 }
 
-/// loop through each transaction for validation
+/// loop through each transaction to accumulate data onto an array of `Account`.
+///
 /// complexity: O(n)
+/// ```
+/// let file_path = PathBuf::from(String::from("../sample_input.csv"));
+/// let reader = csv::Reader::from_path(file_path);
+/// let accounts = sequential_serde(reader)?;
+/// assert_eq!(accounts.len(), 5);
+/// ```
 fn sequential_serde(mut rdr: csv::Reader<File>) -> Result<Vec<Account>, anyhow::Error> {
     let mut transaction_map = TransactionHM::new();
     let mut account_map = AccountHM::new();
@@ -111,6 +118,8 @@ fn sequential_serde(mut rdr: csv::Reader<File>) -> Result<Vec<Account>, anyhow::
     Ok(account_map.values().cloned().collect::<Vec<Account>>())
 }
 
+/// loop through the input array to round & serialize account data and then flush to term.
+///
 /// complexity: O(n)
 fn flush(mut wtr: csv::Writer<io::Stdout>, accounts: Vec<Account>) -> Result<(), anyhow::Error> {
     // convert amount to precise up to 4 decimal places
