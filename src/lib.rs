@@ -8,9 +8,9 @@ use csv::Reader;
 use std::collections::HashMap;
 use std::fs::File;
 
-/// account.id: account
+/// <account.id, account>
 type AccountHM = HashMap<u16, Account>;
-/// transaction.tx_id: transaction
+/// <transaction.tx_id, transaction>
 type TransactionHM = HashMap<u32, Transaction>;
 
 /// loop through each transaction to accumulate data onto an array of `Account`.
@@ -34,7 +34,7 @@ pub fn sequential_serde(mut rdr: Reader<File>) -> Result<Vec<Account>, anyhow::E
     let mut account_map = AccountHM::new();
 
     for (idx, result) in rdr.deserialize().enumerate() {
-        let err_msg = format!("Invalid transaction: Malformed object at {}", idx);
+        let err_msg = format!("Fail to deserialize: Malformed object at {}", idx);
         let trans: Transaction = result.context(err_msg)?;
 
         match trans.get_trans_type().as_str() {
@@ -58,9 +58,13 @@ pub fn sequential_serde(mut rdr: Reader<File>) -> Result<Vec<Account>, anyhow::E
                 }
             },
             "withdrawal" => {
+                let err_msg = format!(
+                    "Fail to withdrawal: Account {} not found",
+                    &trans.get_client_id()
+                );
                 let existing_acc = account_map
                     .get_mut(&trans.get_client_id())
-                    .context("Fail to withdrawal: Account not found")?;
+                    .context(err_msg)?;
                 // check if account has sufficient available funds
                 let withdraw_amount = trans.get_amount().unwrap_or(0_f32);
                 if existing_acc.get_available() >= withdraw_amount && !existing_acc.locked {
@@ -70,9 +74,13 @@ pub fn sequential_serde(mut rdr: Reader<File>) -> Result<Vec<Account>, anyhow::E
                 }
             }
             "dispute" => {
+                let err_msg = format!(
+                    "Fail to dispute: Account {} not found",
+                    &trans.get_client_id()
+                );
                 let existing_acc = account_map
                     .get_mut(&trans.get_client_id())
-                    .context("Fail to dispute: Account not found")?;
+                    .context(err_msg)?;
                 if !existing_acc.locked {
                     if let Some(existing_trans) = transaction_map.get_mut(&trans.get_tx_id()) {
                         let amount = existing_trans.get_amount().unwrap_or(0_f32);
@@ -82,9 +90,13 @@ pub fn sequential_serde(mut rdr: Reader<File>) -> Result<Vec<Account>, anyhow::E
                 }
             }
             "resolve" => {
+                let err_msg = format!(
+                    "Fail to resolve: Account {} not found",
+                    &trans.get_client_id()
+                );
                 let existing_acc = account_map
                     .get_mut(&trans.get_client_id())
-                    .context("Fail to resolve: Account not found")?;
+                    .context(err_msg)?;
                 if !existing_acc.locked {
                     if let Some(existing_trans) = transaction_map.get_mut(&trans.get_tx_id()) {
                         let amount = existing_trans.get_amount().unwrap_or(0_f32);
@@ -94,9 +106,13 @@ pub fn sequential_serde(mut rdr: Reader<File>) -> Result<Vec<Account>, anyhow::E
                 }
             }
             "chargeback" => {
+                let err_msg = format!(
+                    "Fail to chargeback: Account {} not found",
+                    &trans.get_client_id()
+                );
                 let existing_acc = account_map
                     .get_mut(&trans.get_client_id())
-                    .context("Fail to chargeback: Account not found")?;
+                    .context(err_msg)?;
                 if !existing_acc.locked {
                     if let Some(existing_trans) = transaction_map.get_mut(&trans.get_tx_id()) {
                         let amount = existing_trans.get_amount().unwrap_or(0_f32);
