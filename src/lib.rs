@@ -122,7 +122,11 @@ pub fn sequential_serde(mut rdr: Reader<File>) -> Result<Vec<Account>, anyhow::E
                     }
                 }
             }
-            _ => continue,
+            _ => {
+                let err_msg = format!("Fail to deserialize: Invalid type at {}", idx);
+                let err = anyhow::Error::msg(err_msg);
+                return Err(err);
+            }
         }
     }
     Ok(account_map.values().cloned().collect::<Vec<Account>>())

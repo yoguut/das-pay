@@ -14,7 +14,7 @@ fn main() -> Result<(), anyhow::Error> {
     flush(wtr, accounts)
 }
 
-/// loop through the input array to round & serialize account data and then flush to term.
+/// loop through accounts to round & serialize account data and then flush to term.
 ///
 /// complexity: O(n)
 fn flush(mut wtr: csv::Writer<io::Stdout>, accounts: Vec<Account>) -> Result<(), anyhow::Error> {

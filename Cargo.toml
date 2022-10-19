@@ -3,11 +3,12 @@ name = "das-pay"
 description = "People's payment engine."
 version = "0.1.0"
 edition = "2021"
-authors = ["pepe"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["doggo"]
 
 [dependencies]
 anyhow = "^1.0"
 csv = "^1.1"
 serde = { version = "^1.0", features = ["derive"] }
+
+[dev-dependencies]
+tempdir = "^0.3"
