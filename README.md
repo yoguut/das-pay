@@ -20,8 +20,8 @@ lfs needs to be pulled separately as followed:
 git lfs pull
 ```
 
-> WARNING: If you choose to ignore this guide and forget to pull LFS assets,
-> you can run into serialization error.
+> WARNING: If you forget to pull LFS assets, you can run into
+> serialization error.
 
 Next, run the following terminal commands in the repo directory:
 
@@ -37,8 +37,8 @@ the input csv to your desired file path.
 
 ## Contributing
 
-> I have not tested the development workflow on `vscode`, so take the settings
-> in `.vscode` with a grain of salt.
+> I have not tested the development setup on `vscode`, so take the settings
+> and config files in `.vscode` with a grain of salt.
 
 Install cargo-watch if not present: `cargo install cargo-watch`
 Install mdbook if not present: `cargo install mdbook`
@@ -48,6 +48,9 @@ To get things started, here is the recommended setup (not required):
 ```bash,ignore
 cargo watch -x check -x test
 ```
+
+If any errors show up from the last cmd, please open an issue to report to the
+maintainer.
 
 ## Journal
 
