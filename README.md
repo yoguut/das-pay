@@ -40,10 +40,21 @@ the input csv to your desired file path.
 > I have not tested the development setup on `vscode`, so take the settings
 > and config files in `.vscode` with a grain of salt.
 
+It's highly recommended to use a nightly version of rustc, so that benchmark
+codes can be executable if necessary.
+
 Install cargo-watch if not present: `cargo install cargo-watch`
 Install mdbook if not present: `cargo install mdbook`
 
 To get things started, here is the recommended setup (not required):
+
+```bash,ignore
+rustup component add rustfmt --toolchain nightly
+```
+
+```bash,ignore
+cargo +nightly fmt
+```
 
 ```bash,ignore
 cargo watch -x check -x test
@@ -51,6 +62,12 @@ cargo watch -x check -x test
 
 If any errors show up from the last cmd, please open an issue to report to the
 maintainer.
+
+## Known issues
+
+### Benchmarks
+
+Currently `cargo bench` do not work.
 
 ## Journal
 
